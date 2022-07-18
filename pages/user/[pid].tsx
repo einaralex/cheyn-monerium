@@ -1,6 +1,5 @@
-// import { useRouter } from 'next/router'
-import { profile } from "console";
 import Cookies from "cookies";
+
 const Profile = ({ userData }) => {
   return <p>Profile: {userData.name}</p>;
 };
