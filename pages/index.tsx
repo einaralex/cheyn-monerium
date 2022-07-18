@@ -39,8 +39,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   // A server endpoint of yours, that can't expose secrets to the client.
   const redirectUri = `${
-    process.env?.VERCEL_URL
-      ? "https://" + process.env.VERCEL_URL
+    process.env?.NEXT_PUBLIC_VERCEL_ENV === "production"
+      ? "https://monerium-api.vercel.app"
       : "http://localhost:8001"
   }/api/integration/monerium`;
 
