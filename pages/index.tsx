@@ -38,7 +38,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   );
 
   // A server endpoint of yours, that can't expose secrets to the client.
-  const redirectUri = "http://localhost:8001/api/integration/monerium";
+  const redirectUri = `${
+    process.env?.VERCEL_URL
+      ? "https://" + process.env.VERCEL_URL
+      : "http://localhost:8001"
+  }/api/integration/monerium`;
 
   // TODO: You will need to store the codeVerifier and codeChallenge for later.
   const cookieName = "monerium_state";
