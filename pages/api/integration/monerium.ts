@@ -11,9 +11,12 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const cookies = new Cookies(req, res);
-  if (req.query?.code && req.query?.state) {
-    let params = JSON.parse(cookies?.get(req.query.state as string) as string);
-    const authorizationCode = req.query?.code as string;
+  const queryParams = req.query;
+  if (queryParams?.code && queryParams?.state) {
+    let params = JSON.parse(
+      cookies?.get(queryParams.state as string) as string
+    );
+    const authorizationCode = queryParams?.code as string;
 
     const headers = new Headers();
     headers.append("content-type", "application/x-www-form-urlencoded");
@@ -33,29 +36,14 @@ export default async function handler(
         const response = await data.json();
         const { access_token, profile, userId, refresh_token } = response;
 
+        // You should securely store the access_token and the refresh_token
+        // This is not secure, it exposes the access_token to the client:
         cookies.set(profile, JSON.stringify(response));
 
         res.redirect(`/user/${profile}`);
-
-        // await fetch(`https://api-sandbox.monerium.dev/profiles/${profile}`, {
-        //   method: "GET",
-        //   headers: {
-        //     Authorization: `Bearer ${access_token}`,
-        //   },
-        // }).then(async (data) => {
-        //   const response = await data.json();
-        //   console.log("profile", profile);
-        //   console.log("JSON.stringify(response)", JSON.stringify(response));
-        //   try {
-        //     cookies.set(profile, "test");
-        //     console.log(cookies.get(profile));
-        //   } catch (err) {
-        //     console.error("error", err);
-        //   } finally {
-        //     res.redirect(`/user/${profile}`);
-        //   }
-        // });
       });
     }
+  } else {
+    res.status(400).end();
   }
 }

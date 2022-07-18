@@ -1,34 +1,125 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+We start by authenticating.
 
-## Getting Started
+More in-depth: [Monerium API Documentation](https://monerium.dev/docs/api)
 
-First, run the development server:
+There are two ways to authenticate as an application owner, authentication_code flow or client credentials.
 
-```bash
-npm run dev
-# or
-yarn dev
+Authentication flow is handy single page application, client credentials requires you to have a server to conceal your API key.
+
+We will be building around the authentication_code flo.
+
+We start of by building the query parameters needed to enter the Monerium portal.
+
+```js
+// pages/index.ts
+
+{
+  // Random generated string.
+  const codeVerifier = CryptoJS.lib.WordArray.random(64).toString();
+
+  // code_challenge = base64urlEncode(SHA256(ASCII(code_verifier)))
+  const codeChallenge = CryptoJS.enc.Base64url.stringify(
+    CryptoJS.SHA256(codeVerifier)
+  );
+
+  // A server endpoint of yours, that can't expose secrets to the client.
+  const redirectUri = `${baseUrl}/api/integration/monerium`;
+
+  // TODO: You will need to store the codeVerifier and codeChallenge for later.
+  const cookieName = "monerium-state";
+
+  const params = {
+    client_id: "1337",
+    redirect_uri: redirectUri,
+    code_challenge: codeChallenge,
+    code_challenge_method: "S256",
+    state: cookieName,
+  };
+
+  cookies.set(
+    cookieName,
+    JSON.stringify({ ...params, code_verifier: codeVerifier })
+  );
+}
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+When the user clicks `Create IBAN`, redirect to the Monerium portal
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+```js
+router.push(
+  `https://sandbox.monerium.dev/partners/piedpiper/auth?${new URLSearchParams(
+    params
+  ).toString()}`
+);
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+When the user has an account, has signed up for an IBAN and has accepted to allow you to read his profile and payment info, they will be directed to the `redirect_uri` you defined, this will have to match one of the `redirectUris` you have applied to your Monerium application. (TBD: Applying for a Monerium application.)
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+The url we got back now has the following parameters `code` and `state`.
 
-## Learn More
+We use the authorization `code` to fetch an `access_token`.
 
-To learn more about Next.js, take a look at the following resources:
+```js
+// pages/api/integration/monerium.ts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+if (queryParams?.code && queryParams?.state) {
+  let params = JSON.parse(cookies?.get(queryParams.state));
+  const authorizationCode = queryParams?.code;
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+  const headers = new Headers();
+  headers.append("content-type", "application/x-www-form-urlencoded"); // Required.
 
-## Deploy on Vercel
+  if (authorizationCode && params && params?.client_id) {
+    await fetch("https://api-sandbox.monerium.dev/auth/token", {
+      method: "POST",
+      body: new URLSearchParams({
+        client_id: params.client_id,
+        code: authorizationCode,
+        redirect_uri: params.redirect_uri,
+        grant_type: "authorization_code",
+        code_verifier: params.code_verifier,
+      }),
+      headers: headers,
+    }).then(async (data) => {
+      const response = await data.json();
+      const { access_token, profile, userId, refresh_token } = response;
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+      // You should securely store the access_token and the refresh_token
+      // This is not secure, it exposes the access_token to the client:
+      cookies.set(profile, JSON.stringify(response));
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+      // Redirect to your url of choice.
+      res.redirect(`/user/${profile}`);
+    });
+  }
+}
+```
+
+We now have an `access_token` to fetch all the information we need about this specific user.
+
+Access tokens have a short lifespan, use the `refresh_token` to update it.
+
+```js
+ fetch("https://api-sandbox.monerium.dev/auth/token", {
+      method: "POST",
+      body: new URLSearchParams({
+        client_id: '1337',
+        grant_type: 'refresh_token'
+        refresh_token: 'IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk', // get this from your database
+      })
+ })
+```
+
+example response
+
+```js
+{
+  "access_token":"MTQ0NjJkZmQ5OTM2NDE1ZTZjNGZmZjI3",
+  "token_type":"Bearer",
+  "expires_in":3600,
+  "refresh_token":"IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk",
+  "scope":"orders:read"
+  "profile":"asd1234f-f05e-11eb-8143-62d421e33aed",
+  "userId":"qwer6789-f05e-11eb-8143-62d421e33aed"
+}
+```

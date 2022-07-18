@@ -2,8 +2,11 @@ import type { NextPage, GetServerSideProps } from "next";
 import CryptoJS from "crypto-js";
 import Cookies from "cookies";
 import { useRouter } from "next/router";
-// import styles from '../styles/Home.module.css'
-// emi.authenticate(client_id);
+
+const baseUrl =
+  process.env?.NEXT_PUBLIC_VERCEL_ENV === "production"
+    ? "https://monerium-api.vercel.app"
+    : "http://localhost:8001";
 
 const Home: NextPage<{ params: any }> = ({ params }) => {
   const router = useRouter();
@@ -15,7 +18,11 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
       ).toString()}`
     );
     // example:
-    //   https://sandbox.monerium.dev/partners/piedpiper/auth?code_challenge=YmgGyzsAN28CpfTrJESF-p_42_YMRH8Y6jAfF2pbuhc&code_challenge_method=S256&redirect_uri=http://localhost:8001/integration/monerium
+    //  https://sandbox.monerium.dev/partners/piedpiper/auth
+    //    ?client_id='1337'
+    //    &code_challenge=YmgGyzsAN28CpfTrJESF-p_42_YMRH8Y6jAfF2pbuhc
+    //    &code_challenge_method=S256
+    //    &redirect_uri=http://localhost:8001/integration/monerium
   };
 
   return (
@@ -38,14 +45,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   );
 
   // A server endpoint of yours, that can't expose secrets to the client.
-  const redirectUri = `${
-    process.env?.NEXT_PUBLIC_VERCEL_ENV === "production"
-      ? "https://monerium-api.vercel.app"
-      : "http://localhost:8001"
-  }/api/integration/monerium`;
+  const redirectUri = `${baseUrl}/api/integration/monerium`;
 
-  // TODO: You will need to store the codeVerifier and codeChallenge for later.
-  const cookieName = "monerium_state";
+  // You will need to store the codeVerifier and codeChallenge for later.
+  const cookieName = "monerium-state";
 
   const params = {
     client_id: "1337",
