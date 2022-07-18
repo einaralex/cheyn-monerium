@@ -1,11 +1,11 @@
-import type { NextPage } from "next";
+import type { NextPage, GetServerSideProps } from "next";
 import CryptoJS from "crypto-js";
 import Cookies from "cookies";
 import { useRouter } from "next/router";
 // import styles from '../styles/Home.module.css'
 // emi.authenticate(client_id);
 
-const Home: NextPage = ({ params }) => {
+const Home: NextPage<{ params: any }> = ({ params }) => {
   const router = useRouter();
 
   const emiConnect = () => {
@@ -26,7 +26,7 @@ const Home: NextPage = ({ params }) => {
   );
 };
 
-export async function getServerSideProps({ req, res }) {
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const cookies = new Cookies(req, res);
 
   // Random generated string.
@@ -59,5 +59,5 @@ export async function getServerSideProps({ req, res }) {
   return {
     props: { params }, // will be passed to the page component as props
   };
-}
+};
 export default Home;

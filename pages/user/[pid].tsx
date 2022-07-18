@@ -1,12 +1,17 @@
 import Cookies from "cookies";
+import type { NextPage, GetServerSideProps } from "next";
 
-const Profile = ({ userData }) => {
+const Profile: NextPage<{ userData: any }> = ({ userData }) => {
   return <p>Profile: {userData.name}</p>;
 };
 
-export async function getServerSideProps({ req, res, query }) {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+  query,
+}) => {
   const cookies = new Cookies(req, res);
-  const userAccess = JSON.parse(cookies.get(query?.pid));
+  const userAccess = JSON.parse(cookies.get(query?.pid as string) as string);
 
   const userData = await fetch(
     `https://api-sandbox.monerium.dev/profiles/${userAccess.profile}`,
@@ -24,6 +29,6 @@ export async function getServerSideProps({ req, res, query }) {
   return {
     props: { userData }, // will be passed to the page component as props
   };
-}
+};
 
 export default Profile;
