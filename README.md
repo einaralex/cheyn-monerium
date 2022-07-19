@@ -2,9 +2,16 @@ Start here: [Monerium API Documentation](https://monerium.dev/docs/api)
 
 View live example at https://monerium-api.vercel.app
 
-There are two ways to authenticate, with authentication code flow or client credentials.
+# Basic authentication.
 
-Lets see how we build around the authentication code flow.
+Fetch information about your own profile.
+`curl --user 'user@example.com:password' https://api-sandbox.monerium.dev/balances`
+
+# Bearer tokens.
+
+There are two ways to authenticate with Bearer, with authentication code flow or client credentials.
+
+Lets see how we build around the authentication_code flow.
 
 We start of by structuring the query parameters needed to enter the Monerium portal.
 
@@ -102,7 +109,7 @@ Access tokens have a short lifespan, use the `refresh_token` to update it.
       method: "POST",
       body: new URLSearchParams({
         client_id: '1337',
-        grant_type: 'refresh_token',
+        grant_type: 'refresh_token'
         refresh_token: 'IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk', // get this from your database
       })
  })
