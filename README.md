@@ -2,13 +2,11 @@ We start by authenticating.
 
 More in-depth: [Monerium API Documentation](https://monerium.dev/docs/api)
 
-There are two ways to authenticate as an application owner, authentication_code flow or client credentials.
+There are two ways to authenticate, with authentication code flow or client credentials.
 
-Authentication flow is handy single page application, client credentials requires you to have a server to conceal your API key.
+Lets see how we build around the authentication_code flow.
 
-We will be building around the authentication_code flo.
-
-We start of by building the query parameters needed to enter the Monerium portal.
+We start of by structuring the query parameters needed to enter the Monerium portal.
 
 ```js
 // pages/index.ts
@@ -110,7 +108,7 @@ Access tokens have a short lifespan, use the `refresh_token` to update it.
  })
 ```
 
-example response
+Example response:
 
 ```js
 {
@@ -122,4 +120,35 @@ example response
   "profile":"asd1234f-f05e-11eb-8143-62d421e33aed",
   "userId":"qwer6789-f05e-11eb-8143-62d421e33aed"
 }
+```
+
+## Client credentials.
+
+Confidential clients which can hide their credentials, e.g. backend servers, can be enlisted in Monerium's partner program, which enables them simultaneous access to multiple profiles which have granted authorization.
+
+```js
+// pages/admin.tsx
+
+const headers = new Headers();
+headers.append("content-type", "application/x-www-form-urlencoded"); // Required
+
+const authToken = await fetch("https://api-sandbox.monerium.dev/auth/token", {
+  method: "POST",
+  body: new URLSearchParams({
+    client_id: "1234567890abcdef",
+    client_secret: "1234567890abcdef1234567890abcdef",
+    grant_type: "client_credentials",
+  }),
+  headers: headers,
+});
+const clientCredentials = await authToken.json();
+const authContext = await fetch(
+  "https://api-sandbox.monerium.dev/auth/context",
+  {
+    method: "GET",
+    headers: new Headers({
+      Authorization: `Bearer ${clientCredentials.access_token}`,
+    }),
+  }
+);
 ```

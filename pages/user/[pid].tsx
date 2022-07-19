@@ -2,14 +2,15 @@ import Cookies from "cookies";
 import type { NextPage, GetServerSideProps } from "next";
 import { useState, useEffect } from "react";
 
-import type { Account, Balance } from "../../types/index";
+import type { AuthContext, Balances, Profile } from "../../types/index";
 import { getBalanceForAccounts } from "../../helpers/accounts";
+import styles from "../../styles/User.module.css";
 
-const Profile: NextPage<{ userData: any }> = ({
-  userData,
-  userAuth,
-  token,
-}) => {
+const UserProfile: NextPage<{
+  userData: Profile;
+  userAuth: AuthContext;
+  token: any;
+}> = ({ userData, userAuth, token }) => {
   const [accounts, setAccounts] = useState(userData.accounts);
 
   useEffect(() => {
@@ -24,8 +25,8 @@ const Profile: NextPage<{ userData: any }> = ({
           },
         }
       ).then(async (data) => {
-        const balances = await data.json();
-        setAccounts(getBalanceForAccounts(accounts, balances));
+        const balances: Balances[] = await data.json();
+        setAccounts(getBalanceForAccounts(accounts, balances) as any);
         return balances;
       });
     };
@@ -44,25 +45,25 @@ const Profile: NextPage<{ userData: any }> = ({
           ? "👍"
           : "👎"}
       </p>
-      <table style={{ textAlign: "left" }}>
+      <table className={styles.table} style={{ textAlign: "left" }}>
         <thead>
           <tr>
-            <th>currency</th>
-            <th>balance</th>
+            <th className={styles.balances}>balance</th>
             <th>network</th>
             <th>address</th>
             <th>iban</th>
           </tr>
         </thead>
         <tbody>
-          {accounts?.map((a: Account & Balance, i: number) => (
+          {accounts?.map((a: any, i: number) => (
             <tr key={i + a.currency + a.amount}>
-              <td>{a.currency}</td>
-              <td>{a.amount}</td>
+              <td>
+                {a.amount || 0} {a.currency}
+              </td>
+              <td>{a.address.slice(0, 6) + "..." + a.address.slice(-4)}</td>
               <td>
                 {a.chain}:{a.network}
               </td>
-              <td>{a.address}</td>
               <td>{a.iban}</td>
             </tr>
           ))}
@@ -80,7 +81,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const cookies = new Cookies(req, res);
   const userAccess = JSON.parse(cookies.get(query?.pid as string) as string);
 
-  const userData = await fetch(
+  const userData: Profile = await fetch(
     `https://api-sandbox.monerium.dev/profiles/${userAccess.profile}`,
     {
       method: "GET",
@@ -92,7 +93,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     return await data.json();
   });
 
-  const userAuth = await fetch(
+  const userAuth: AuthContext = await fetch(
     `https://api-sandbox.monerium.dev/auth/context`,
     {
       method: "GET",
@@ -103,8 +104,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   ).then(async (data) => {
     return await data.json();
   });
-  console.log("userData", userData);
-  console.log("userAuth", userAuth);
 
   return {
     props: {
@@ -115,4 +114,4 @@ export const getServerSideProps: GetServerSideProps = async ({
   };
 };
 
-export default Profile;
+export default UserProfile;

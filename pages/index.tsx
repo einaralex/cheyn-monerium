@@ -2,6 +2,8 @@ import type { NextPage, GetServerSideProps } from "next";
 import CryptoJS from "crypto-js";
 import Cookies from "cookies";
 import { useRouter } from "next/router";
+import Image from "next/image";
+import styles from "../styles/Home.module.css";
 
 const baseUrl =
   process.env?.NEXT_PUBLIC_VERCEL_ENV === "production"
@@ -17,18 +19,16 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
         params
       ).toString()}`
     );
-    // example:
-    //  https://sandbox.monerium.dev/partners/piedpiper/auth
-    //    ?client_id='1337'
-    //    &code_challenge=YmgGyzsAN28CpfTrJESF-p_42_YMRH8Y6jAfF2pbuhc
-    //    &code_challenge_method=S256
-    //    &redirect_uri=http://localhost:8001/integration/monerium
   };
 
   return (
-    <div>
+    <div className={styles.main}>
       <h1>Be your own bank</h1>
-      <button onClick={() => emiConnect()}>Create Iban</button>
+
+      <button className={styles.ibanButton} onClick={() => emiConnect()}>
+        <Image src="/monerium.svg" alt="me" width="24" height="24" />
+        Create Iban
+      </button>
     </div>
   );
 };

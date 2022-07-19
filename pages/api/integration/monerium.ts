@@ -19,7 +19,7 @@ export default async function handler(
     const authorizationCode = queryParams?.code as string;
 
     const headers = new Headers();
-    headers.append("content-type", "application/x-www-form-urlencoded");
+    headers.append("content-type", "application/x-www-form-urlencoded"); // Required
 
     if (authorizationCode && params && params?.client_id) {
       await fetch("https://api-sandbox.monerium.dev/auth/token", {

@@ -1,0 +1,19 @@
+.table {
+  border-spacing: 0;
+}
+.table thead {
+  border-color:#6fbf7e;
+  background-color: #6fbf7e;
+    margin-top: 8px;
+}
+
+.table th {
+  height: 36px;
+}
+.table td {
+  height: 24px;
+}
+
+.balances {
+  width: 100px;
+}
