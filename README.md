@@ -1,6 +1,6 @@
-We start by authenticating.
+Start here: [Monerium API Documentation](https://monerium.dev/docs/api)
 
-More in-depth: [Monerium API Documentation](https://monerium.dev/docs/api)
+View live example at https://monerium-api.vercel.app
 
 There are two ways to authenticate, with authentication code flow or client credentials.
 
