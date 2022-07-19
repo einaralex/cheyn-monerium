@@ -4,7 +4,7 @@ View live example at https://monerium-api.vercel.app
 
 There are two ways to authenticate, with authentication code flow or client credentials.
 
-Lets see how we build around the authentication_code flow.
+Lets see how we build around the authentication code flow.
 
 We start of by structuring the query parameters needed to enter the Monerium portal.
 
