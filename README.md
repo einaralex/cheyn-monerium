@@ -102,7 +102,7 @@ Access tokens have a short lifespan, use the `refresh_token` to update it.
       method: "POST",
       body: new URLSearchParams({
         client_id: '1337',
-        grant_type: 'refresh_token'
+        grant_type: 'refresh_token',
         refresh_token: 'IwOGYzYTlmM2YxOTQ5MGE3YmNmMDFkNTVk', // get this from your database
       })
  })
