@@ -49,8 +49,8 @@ const UserProfile: NextPage<{
         <thead>
           <tr>
             <th className={styles.balances}>balance</th>
-            <th>network</th>
             <th>address</th>
+            <th>network</th>
             <th>iban</th>
           </tr>
         </thead>
