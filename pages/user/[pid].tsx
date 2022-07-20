@@ -17,7 +17,7 @@ const UserProfile: NextPage<{
     const fetchBalance = async () => {
       // Fetching balances can take some time, therefore we fetch it after the initial rendering
       return await fetch(
-        `https://api-sandbox.monerium.dev/profiles/${userData.id}/balances`,
+        `https://api.monerium.dev/profiles/${userData.id}/balances`,
         {
           method: "GET",
           headers: {
@@ -82,7 +82,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   const userAccess = JSON.parse(cookies.get(query?.pid as string) as string);
 
   const userData: Profile = await fetch(
-    `https://api-sandbox.monerium.dev/profiles/${userAccess.profile}`,
+    `https://api.monerium.dev/profiles/${userAccess.profile}`,
     {
       method: "GET",
       headers: {
@@ -94,7 +94,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   });
 
   const userAuth: AuthContext = await fetch(
-    `https://api-sandbox.monerium.dev/auth/context`,
+    `https://api.monerium.dev/auth/context`,
     {
       method: "GET",
       headers: {

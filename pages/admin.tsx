@@ -26,7 +26,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const headers = new Headers();
   headers.append("content-type", "application/x-www-form-urlencoded"); // Required
 
-  const authToken = await fetch("https://api-sandbox.monerium.dev/auth/token", {
+  const authToken = await fetch("https://api.monerium.dev/auth/token", {
     method: "POST",
     body: new URLSearchParams({
       client_id: "1234567890abcdef",
@@ -37,15 +37,12 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   });
   const clientCredentials = await authToken.json();
 
-  const authContext = await fetch(
-    "https://api-sandbox.monerium.dev/auth/context",
-    {
-      method: "GET",
-      headers: new Headers({
-        Authorization: `Bearer ${clientCredentials.access_token}`,
-      }),
-    }
-  );
+  const authContext = await fetch("https://api.monerium.dev/auth/context", {
+    method: "GET",
+    headers: new Headers({
+      Authorization: `Bearer ${clientCredentials.access_token}`,
+    }),
+  });
 
   return {
     props: { authContext: await authContext.json() }, // will be passed to the page component as props

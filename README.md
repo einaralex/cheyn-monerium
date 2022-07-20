@@ -5,15 +5,17 @@ View live example at https://monerium-api.vercel.app
 # Basic authentication.
 
 Fetch information about your own profile.
-`curl --user 'user@example.com:password' https://api-sandbox.monerium.dev/balances`
+`curl --user 'user@example.com:password' https://api.monerium.dev/balances`
 
 # Bearer tokens.
 
 There are two ways to authenticate with Bearer, with authentication code flow or client credentials.
+If you are managing a platform, you will use <a href="#client-credentials">client credentials</a>, getting an access token with your `client_id` and `client_secret`.
+A customer of yours will authenticate using the authentication code flow.
 
-Lets see how we build around the authentication_code flow.
+Let's see how we build around the authentication_code flow.
 
-We start of by structuring the query parameters needed to enter the Monerium portal.
+We start by structuring the query parameters needed to enter the Monerium management screen.
 
 ```js
 // pages/index.ts
@@ -75,7 +77,7 @@ if (queryParams?.code && queryParams?.state) {
   headers.append("content-type", "application/x-www-form-urlencoded"); // Required.
 
   if (authorizationCode && params && params?.client_id) {
-    await fetch("https://api-sandbox.monerium.dev/auth/token", {
+    await fetch("https://api.monerium.dev/auth/token", {
       method: "POST",
       body: new URLSearchParams({
         client_id: params.client_id,
@@ -105,7 +107,7 @@ We now have an `access_token` to fetch all the information we need about this sp
 Access tokens have a short lifespan, use the `refresh_token` to update it.
 
 ```js
- fetch("https://api-sandbox.monerium.dev/auth/token", {
+ fetch("https://api.monerium.dev/auth/token", {
       method: "POST",
       body: new URLSearchParams({
         client_id: '1337',
@@ -131,7 +133,7 @@ Example response:
 
 ## Client credentials.
 
-Confidential clients which can hide their credentials, e.g. backend servers, can be enlisted in Monerium's partner program, which enables them simultaneous access to multiple profiles which have granted authorization.
+Confidential clients who can hide their credentials, e.g. backend servers, can be enlisted in Monerium's partner program, which enables them simultaneous access to multiple profiles which have granted authorization.
 
 ```js
 // pages/admin.tsx
@@ -139,23 +141,20 @@ Confidential clients which can hide their credentials, e.g. backend servers, can
 const headers = new Headers();
 headers.append("content-type", "application/x-www-form-urlencoded"); // Required
 
-const authToken = await fetch("https://api-sandbox.monerium.dev/auth/token", {
+const authToken = await fetch("https://api.monerium.dev/auth/token", {
   method: "POST",
   body: new URLSearchParams({
-    client_id: "1234567890abcdef",
-    client_secret: "1234567890abcdef1234567890abcdef",
+    client_id: "1b3a17ef-460f-47b0-84c6-4495e18589b3",
+    client_secret: "samplepassword",
     grant_type: "client_credentials",
   }),
   headers: headers,
 });
 const clientCredentials = await authToken.json();
-const authContext = await fetch(
-  "https://api-sandbox.monerium.dev/auth/context",
-  {
-    method: "GET",
-    headers: new Headers({
-      Authorization: `Bearer ${clientCredentials.access_token}`,
-    }),
-  }
-);
+const authContext = await fetch("https://api.monerium.dev/auth/context", {
+  method: "GET",
+  headers: new Headers({
+    Authorization: `Bearer ${clientCredentials.access_token}`,
+  }),
+});
 ```

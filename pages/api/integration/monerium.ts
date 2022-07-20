@@ -22,7 +22,7 @@ export default async function handler(
     headers.append("content-type", "application/x-www-form-urlencoded"); // Required
 
     if (authorizationCode && params && params?.client_id) {
-      await fetch("https://api-sandbox.monerium.dev/auth/token", {
+      await fetch("https://api.monerium.dev/auth/token", {
         method: "POST",
         body: new URLSearchParams({
           client_id: params.client_id,
