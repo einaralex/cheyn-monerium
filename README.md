@@ -50,7 +50,7 @@ We start by structuring the query parameters needed to enter the Monerium manage
 }
 ```
 
-When the user clicks `Create IBAN`, redirect to the Monerium portal
+When the user clicks `Create IBAN`, redirect to the Monerium manage screen.
 
 ```js
 router.push(
