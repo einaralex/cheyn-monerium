@@ -6,7 +6,7 @@ import Image from "next/image";
 import styles from "../styles/Home.module.css";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import { Web3Provider } from "@ethersproject/providers";
+import { Web3Provider, JsonRpcSigner } from "@ethersproject/providers";
 
 const baseUrl =
   process.env?.NEXT_PUBLIC_VERCEL_ENV === "production"
@@ -14,8 +14,8 @@ const baseUrl =
     : "http://localhost:8001";
 
 const Home: NextPage<{ params: any }> = ({ params }) => {
-  const [provider, setProvider] = useState();
-  const [signer, setSigner] = useState();
+  const [provider, setProvider] = useState<Web3Provider>();
+  const [signer, setSigner] = useState<JsonRpcSigner>();
   const router = useRouter();
 
   const connectWallet = async () => {
@@ -23,7 +23,7 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
   };
 
   useEffect(() => {
-    setProvider(new ethers.providers.Web3Provider(window.ethereum));
+    setProvider(new ethers.providers.Web3Provider((window as any).ethereum));
   }, []);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
   return (
     <div className={styles.main}>
       <h1>Be your own bank</h1>
-      <p>{window.ethereum?.selectedAddress}</p>
+      <p>{(window as any).ethereum?.selectedAddress}</p>
       <button onClick={() => connectWallet()}>Connect wallet</button>
       <button className={styles.ibanButton} onClick={() => emiConnect()}>
         <Image src="/monerium.svg" alt="me" width="24" height="24" />
