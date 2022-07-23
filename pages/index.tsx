@@ -14,35 +14,23 @@ const baseUrl =
     : "http://localhost:8001";
 
 const Home: NextPage<{ params: any }> = ({ params }) => {
-  const [provider, setProvider] = useState<Web3Provider>();
+  const [provider, setProvider] = useState();
   const [signer, setSigner] = useState();
   const router = useRouter();
 
+  const connectWallet = async () => {
+    await provider?.send("eth_requestAccounts", []);
+  };
+
   useEffect(() => {
-    let p = new ethers.providers.Web3Provider(window.ethereum);
-    const getPermission = async () => {
-      console.log("no go?");
-      // return provider.request({ method: "eth_requestAccounts" });
-      await p.send("eth_requestAccounts", []);
-    };
-    getPermission();
-    // setProvider(p);
+    setProvider(new ethers.providers.Web3Provider(window.ethereum));
   }, []);
 
-  // useEffect(() => {
-  //   if (provider) {
-  //     console.log("I NEVER GO!??");
-  //     const getPermission = async () => {
-  //       console.log("no go?");
-  //       // return provider.request({ method: "eth_requestAccounts" });
-  //     };
-  //     getPermission();
-  //     getPermission();
-  //     getPermission();
-  //     // setSigner(provider?.getSigner());
-  //     let sign = provider?.getSigner();
-  //   }
-  // }, [provider]);
+  useEffect(() => {
+    if (provider) {
+      setSigner(provider?.getSigner());
+    }
+  }, [provider]);
 
   const emiConnect = () => {
     router.push(
@@ -55,7 +43,8 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
   return (
     <div className={styles.main}>
       <h1>Be your own bank</h1>
-      <p>{provider?.selectedAddress}</p>
+      <p>{window.ethereum?.selectedAddress}</p>
+      <button onClick={() => connectWallet()}>Connect wallet</button>
       <button className={styles.ibanButton} onClick={() => emiConnect()}>
         <Image src="/monerium.svg" alt="me" width="24" height="24" />
         Create IBAN
