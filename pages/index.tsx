@@ -23,6 +23,10 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
     await provider?.send("eth_requestAccounts", []);
   };
 
+  const signMessage = async () => {
+    await signer?.signMessage("Hello World");
+  };
+
   useEffect(() => {
     setProvider(new ethers.providers.Web3Provider((window as any).ethereum));
   }, []);
@@ -47,6 +51,7 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
       <h1>Be your own bank</h1>
       <p>{selectedAddress}</p>
       <button onClick={() => connectWallet()}>Connect wallet</button>
+      <button onClick={() => signMessage()}>Sign</button>
       <button className={styles.ibanButton} onClick={() => emiConnect()}>
         <Image src="/monerium.svg" alt="me" width="24" height="24" />
         Create IBAN
