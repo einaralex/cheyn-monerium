@@ -16,6 +16,7 @@ const baseUrl =
 const Home: NextPage<{ params: any }> = ({ params }) => {
   const [provider, setProvider] = useState<Web3Provider>();
   const [signer, setSigner] = useState<JsonRpcSigner>();
+  const [selectedAddress, setSelectedAddress] = useState("");
   const router = useRouter();
 
   const connectWallet = async () => {
@@ -28,6 +29,7 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
 
   useEffect(() => {
     if (provider) {
+      setSelectedAddress((window as any).ethereum?.selectedAddress);
       setSigner(provider?.getSigner());
     }
   }, [provider]);
@@ -43,7 +45,7 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
   return (
     <div className={styles.main}>
       <h1>Be your own bank</h1>
-      <p>{(window as any).ethereum?.selectedAddress}</p>
+      <p>{selectedAddress}</p>
       <button onClick={() => connectWallet()}>Connect wallet</button>
       <button className={styles.ibanButton} onClick={() => emiConnect()}>
         <Image src="/monerium.svg" alt="me" width="24" height="24" />
