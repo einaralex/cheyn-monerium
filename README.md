@@ -1,6 +1,6 @@
 Start here: [Monerium API Documentation](https://monerium.dev/docs/api)
 
-View live example at https://monerium-api.vercel.app
+View live example at https://cheyn-monerium.vercel.app
 
 # Basic authentication.
 

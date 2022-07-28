@@ -10,7 +10,7 @@ import { Web3Provider, JsonRpcSigner } from "@ethersproject/providers";
 
 const baseUrl =
   process.env?.NEXT_PUBLIC_VERCEL_ENV === "production"
-    ? "https://1inch-monerium.vercel.app"
+    ? "https://cheyn-monerium.vercel.app"
     : "http://localhost:8001";
 
 const Home: NextPage<{ params: any }> = ({ params }) => {
@@ -19,13 +19,13 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
   const [selectedAddress, setSelectedAddress] = useState("");
   const router = useRouter();
 
-  const connectWallet = async () => {
-    await provider?.send("eth_requestAccounts", []);
-  };
+  // const connectWallet = async () => {
+  //   await provider?.send("eth_requestAccounts", []);
+  // };
 
-  const signMessage = async () => {
-    await signer?.signMessage("Hello World");
-  };
+  // const signMessage = async () => {
+  //   await signer?.signMessage("Hello World");
+  // };
 
   useEffect(() => {
     setProvider(new ethers.providers.Web3Provider((window as any).ethereum));
@@ -40,7 +40,7 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
 
   const emiConnect = () => {
     router.push(
-      `https://sandbox.monerium.dev/partners/1inch/auth?${new URLSearchParams(
+      `https://sandbox.monerium.dev/partners/cheyn/auth?${new URLSearchParams(
         params
       ).toString()}`
     );
@@ -50,8 +50,8 @@ const Home: NextPage<{ params: any }> = ({ params }) => {
     <div className={styles.main}>
       <h1>Be your own bank</h1>
       <p>{selectedAddress}</p>
-      <button onClick={() => connectWallet()}>Connect wallet</button>
-      <button onClick={() => signMessage()}>Sign</button>
+      {/* <button onClick={() => connectWallet()}>Connect wallet</button>
+      <button onClick={() => signMessage()}>Sign</button> */}
       <button className={styles.ibanButton} onClick={() => emiConnect()}>
         <Image src="/monerium.svg" alt="me" width="24" height="24" />
         Create IBAN
@@ -78,7 +78,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const cookieName = "monerium-state";
 
   const params = {
-    client_id: "7c92dcf7-b90a-4ff4-98e8-3c7d6c7f4afc",
+    client_id: "799cf071-f4d2-450a-8d1b-1bb8e9a875a2",
     redirect_uri: redirectUri,
     code_challenge: codeChallenge,
     code_challenge_method: "S256",
